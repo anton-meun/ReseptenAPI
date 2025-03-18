@@ -86,6 +86,26 @@ namespace _10_Resepten.Controllers
             var favorites = await _userService.GetFavoritesByUserAsync(userId);
             return Ok(favorites);
         }
+
+        [Authorize]
+        [HttpDelete("favorites/{mealId}")]
+        public async Task<IActionResult> DeleteFavorite(int mealId)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+                var deleted = await _userService.DeleteFavoriteAsync(userId, mealId);
+                if (!deleted) return NotFound("Favorite not found.");
+
+                return Ok("Favorite removed successfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 
 }

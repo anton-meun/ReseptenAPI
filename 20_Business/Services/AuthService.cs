@@ -43,7 +43,7 @@ namespace _20_Business.Services
                 issuer,
                 issuer,
                 claims,
-                expires: DateTime.UtcNow.AddHours(2),
+                expires: DateTime.UtcNow.AddHours(24),
                 signingCredentials: credentials
             );
 
