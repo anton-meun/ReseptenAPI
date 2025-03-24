@@ -18,6 +18,15 @@ if (string.IsNullOrWhiteSpace(key) || key.Length < 32)
     throw new InvalidOperationException("JWT Key is missing or too short! It must be at least 32 characters long.");
 }
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader());
+});
+
+
 // Voeg databasecontext toe
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ReseptenAPIDB")
@@ -42,6 +51,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Dependency Injection
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 
 // Controllers
 builder.Services.AddControllers();
@@ -91,7 +101,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseCors("AllowAll");
 app.MapControllers();
 app.Run();
 

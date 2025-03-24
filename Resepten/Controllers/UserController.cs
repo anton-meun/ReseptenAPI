@@ -52,23 +52,25 @@ namespace _10_Resepten.Controllers
         }
 
         [Authorize]
-        [HttpPost("favorites")]
-        public async Task<IActionResult> AddFavorite([FromBody] FavoriteDto favoriteDto) // use DTO so moddel wont be shown
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto updateUserDto)
         {
             try
             {
-                // get userId from JWT-token
                 var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-                var favorite = new Favorite
+                
+                var user = new User
                 {
-                    UserId = userId,
-                    MealId = favoriteDto.MealId,
-                    Comment = favoriteDto.Comment
+                    FirstName = updateUserDto.FirstName,
+                    LastName = updateUserDto.LastName,
+                    Email = updateUserDto.Email,
+                    Password = updateUserDto.NewPassword
                 };
 
-                await _userService.AddFavoriteAsync(userId, favorite);
-                return Ok();
+                
+                var updatedUser = await _userService.UpdateUserAsync(userId, user);
+                return Ok(updatedUser);
             }
             catch (Exception ex)
             {
@@ -76,35 +78,12 @@ namespace _10_Resepten.Controllers
             }
         }
 
-        [Authorize]
-        [HttpGet("favorites")]
-        public async Task<IActionResult> GetFavoritesByUser()
-        {
-            // get userId from JWT-token
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-            var favorites = await _userService.GetFavoritesByUserAsync(userId);
-            return Ok(favorites);
-        }
+       
 
-        [Authorize]
-        [HttpDelete("favorites/{mealId}")]
-        public async Task<IActionResult> DeleteFavorite(int mealId)
-        {
-            try
-            {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        
 
-                var deleted = await _userService.DeleteFavoriteAsync(userId, mealId);
-                if (!deleted) return NotFound("Favorite not found.");
-
-                return Ok("Favorite removed successfully.");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+       
 
     }
 

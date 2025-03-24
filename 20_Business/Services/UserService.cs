@@ -41,36 +41,48 @@ namespace _20_Business.Services
             return await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task AddFavoriteAsync(int userId, Favorite favorite)
+        public async Task<User> UpdateUserAsync(int userId, User user)
         {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null) throw new Exception("User not found");
-
-            favorite.UserId = userId;
-            _context.Favorites.Add(favorite);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<bool> DeleteFavoriteAsync(int userId, int mealId)
-        {
-            var favorite = await _context.Favorites
-                .FirstOrDefaultAsync(f => f.UserId == userId && f.MealId == mealId);
-
-            if (favorite == null)
+            
+            var existingUser = await _context.Users.FindAsync(userId);
+            if (existingUser == null)
             {
-                return false;
+                throw new Exception("User not found");
             }
 
-            _context.Favorites.Remove(favorite);
+            
+            if (!string.IsNullOrEmpty(user.Email) && user.Email != existingUser.Email)
+            {
+                var emailInUse = await _context.Users.AnyAsync(u => u.Email == user.Email);
+                if (emailInUse)
+                {
+                    throw new Exception("Email address is already in use.");
+                }
+            }
+
+            
+            existingUser.FirstName = !string.IsNullOrEmpty(user.FirstName) ? user.FirstName : existingUser.FirstName;
+            existingUser.LastName = !string.IsNullOrEmpty(user.LastName) ? user.LastName : existingUser.LastName;
+            existingUser.Email = !string.IsNullOrEmpty(user.Email) ? user.Email : existingUser.Email;
+
+            
+            if (!string.IsNullOrWhiteSpace(user.Password))
+            {
+                existingUser.Password = _passwordHasher.HashPassword(existingUser, user.Password);
+            }
+
+            
+            _context.Users.Update(existingUser);
             await _context.SaveChangesAsync();
-            return true;
+
+            return existingUser;
         }
 
 
-        public async Task<IEnumerable<Favorite>> GetFavoritesByUserAsync(int userId)
-        {
-            return await _context.Favorites.Where(f => f.UserId == userId).ToListAsync();
-        }
+
+
+
+
 
         public async Task<User?> GetByEmailAsync(string email)
         {
