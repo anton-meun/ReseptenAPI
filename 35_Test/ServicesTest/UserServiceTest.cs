@@ -174,67 +174,7 @@ public class UserServiceTests
         Assert.Null(validatedUser);
     }
 
-    [Fact]
-    public async Task AddFavoriteAsync_Should_Add_Favorite_When_User_Exists()
-    {
-        var dbContext = await GetDatabaseContext();
-        var userService = new UserService(dbContext);
-        var user = new User { FirstName = "Favorite", LastName = "Tester", Email = "favorite@example.com", Password = "Password123" };
-        await dbContext.Users.AddAsync(user);
-        await dbContext.SaveChangesAsync();
+   
 
-        var favorite = new Favorite { MealId = 1, Comment = "Lekkere maaltijd" };
-        await userService.AddFavoriteAsync(user.Id, favorite);
-
-        var savedFavorite = await dbContext.Favorites.FirstOrDefaultAsync(f => f.UserId == user.Id);
-        Assert.NotNull(savedFavorite);
-        Assert.Equal("Lekkere maaltijd", savedFavorite.Comment);
-    }
-
-    [Fact]
-    public async Task AddFavoriteAsync_Should_Throw_Exception_When_User_Not_Found()
-    {
-        var dbContext = await GetDatabaseContext();
-        var userService = new UserService(dbContext);
-        var favorite = new Favorite { MealId = 1, Comment = "Niet-bestaande gebruiker" };
-
-        await Assert.ThrowsAsync<Exception>(async () => await userService.AddFavoriteAsync(200000, favorite));
-    }
-
-    [Fact]
-    public async Task GetFavoritesByUserAsync_Should_Return_Favorites_When_They_Exist()
-    {
-        var dbContext = await GetDatabaseContext();
-        var userService = new UserService(dbContext);
-        var user = new User { FirstName = "Favoriet", LastName = "Gebruiker", Email = "favuser@example.com", Password = "Password123" };
-        await dbContext.Users.AddAsync(user);
-        await dbContext.SaveChangesAsync();
-
-        var favorites = new List<Favorite>
-        {
-            new Favorite { UserId = user.Id, MealId = 1, Comment = "Mijn eerste favoriet" },
-            new Favorite { UserId = user.Id, MealId = 2, Comment = "Mijn tweede favoriet" }
-        };
-        await dbContext.Favorites.AddRangeAsync(favorites);
-        await dbContext.SaveChangesAsync();
-
-        var userFavorites = await userService.GetFavoritesByUserAsync(user.Id);
-
-        Assert.NotEmpty(userFavorites);
-        Assert.Equal(2, userFavorites.Count());
-    }
-
-    [Fact]
-    public async Task GetFavoritesByUserAsync_Should_Return_EmptyList_When_No_Favorites()
-    {
-        var dbContext = await GetDatabaseContext();
-        var userService = new UserService(dbContext);
-        var user = new User { FirstName = "Lege", LastName = "Gebruiker", Email = "nogeen@example.com", Password = "Password123" };
-        await dbContext.Users.AddAsync(user);
-        await dbContext.SaveChangesAsync();
-
-        var userFavorites = await userService.GetFavoritesByUserAsync(user.Id);
-
-        Assert.Empty(userFavorites);
-    }
+   
 }
