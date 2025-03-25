@@ -112,14 +112,14 @@ namespace _35_Test.ServicesTest
             await dbContext.Favorites.AddAsync(favorite);
             await dbContext.SaveChangesAsync();
 
-            // Controleren of de favoriet eerst bestaat
+            // see if favorite exists
             var existingFavorite = await dbContext.Favorites.FirstOrDefaultAsync(f => f.UserId == user.Id && f.MealId == 1);
             Assert.NotNull(existingFavorite);
 
-            // Verwijder de favoriet
+            // delete favorite
             await favoriteService.DeleteFavoriteAsync(user.Id, 1);
 
-            // Controleren of de favoriet is verwijderd
+            // chek if favorit is deleted
             var deletedFavorite = await dbContext.Favorites.FirstOrDefaultAsync(f => f.UserId == user.Id && f.MealId == 1);
             Assert.Null(deletedFavorite);
         }
@@ -130,7 +130,7 @@ namespace _35_Test.ServicesTest
             var dbContext = await GetDatabaseContext();
             var favoriteService = new FavoriteService(dbContext);
 
-            // Probeer een favoriet te verwijderen voor een niet-bestaande gebruiker
+            // Try to delete a favorite for a non-existent user
             var result = await favoriteService.DeleteFavoriteAsync(99999, 1);
 
             Assert.False(result);
@@ -145,7 +145,7 @@ namespace _35_Test.ServicesTest
             await dbContext.Users.AddAsync(user);
             await dbContext.SaveChangesAsync();
 
-            // Probeer een favoriet te verwijderen die niet bestaat
+            // Try to delete a favorite that does not exist
             var result = await favoriteService.DeleteFavoriteAsync(user.Id, 99999);
 
             Assert.False(result);

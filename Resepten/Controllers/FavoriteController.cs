@@ -55,6 +55,25 @@ namespace _10_Resepten.Controllers
         }
 
         [Authorize]
+        [HttpPut("Updatefavorites/{mealId}")]
+        public async Task<IActionResult> UpdateFavorite(int mealId, [FromBody] FavoriteDto favoriteDto)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+                var updated = await _favoriteService.UpdateFavoriteAsync(userId, mealId, favoriteDto.Comment);
+                if (!updated) return NotFound("Favorite not found.");
+
+                return Ok("Favorite updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
         [HttpDelete("Deletefavorites/{mealId}")]
         public async Task<IActionResult> DeleteFavorite(int mealId)
         {

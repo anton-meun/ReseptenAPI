@@ -77,14 +77,6 @@ namespace _10_Resepten.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
-       
-
-        
-
-       
-
     }
 
 }

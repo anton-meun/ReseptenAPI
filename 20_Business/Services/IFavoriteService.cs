@@ -15,6 +15,7 @@ namespace _20_Business.Services
     {
         Task AddFavoriteAsync(int userId, Favorite favorite);
         Task<IEnumerable<Favorite>> GetFavoritesByUserAsync(int userId);
+        Task<bool> UpdateFavoriteAsync(int userId, int mealId, string newComment);
         Task<bool> DeleteFavoriteAsync(int userId, int mealId);
     }
 }

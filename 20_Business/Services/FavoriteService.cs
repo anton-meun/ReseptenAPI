@@ -45,6 +45,20 @@ namespace _20_Business.Services
             return true;
         }
 
+        public async Task<bool> UpdateFavoriteAsync(int userId, int mealId, string newComment)
+        {
+            var favorite = await _context.Favorites
+                .FirstOrDefaultAsync(f => f.UserId == userId && f.MealId == mealId);
+
+            if (favorite == null)
+            {
+                return false;
+            }
+
+            favorite.Comment = newComment;
+            await _context.SaveChangesAsync();
+            return true;
+        }
 
         public async Task<IEnumerable<Favorite>> GetFavoritesByUserAsync(int userId)
         {
